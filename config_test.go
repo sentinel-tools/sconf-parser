@@ -83,8 +83,9 @@ func TestPodKnownSentinels(t *testing.T) {
 		t.Fail()
 	}
 	pod, err := sconf.GetPod("pod1")
-	if len(pod.KnownSentinels) != 1 {
-		t.Error(fmt.Errorf("Mismatched KnownSentinels. Expected 1, got %d", len(pod.KnownSentinels)))
+	if len(pod.KnownSentinels) != 2 {
+		t.Error(fmt.Errorf("Mismatched KnownSentinels. Expected 2, got %d", len(pod.KnownSentinels)))
+		fmt.Printf("pod: %+v\n", pod)
 		t.Fail()
 	}
 }

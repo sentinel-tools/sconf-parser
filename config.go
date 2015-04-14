@@ -10,30 +10,6 @@ import (
 	"strings"
 )
 
-type PodConfig struct {
-	Name           string
-	MasterIP       string
-	MasterPort     string
-	Authpass       string
-	KnownSentinels []string
-	KnownSlaves    []string
-	Settings       map[string]string
-	Quorum         string
-	BadDirectives  [][]string
-}
-
-// LocalSentinelConfig is a struct holding information about the sentinel RS is
-// running on.
-type SentinelConfig struct {
-	Name              string
-	Host              string
-	Port              int
-	ManagedPodConfigs map[string]PodConfig
-	Dir               string
-	KnownSentinels    []string
-	BadDirectives     []string
-}
-
 func (c *SentinelConfig) GetPod(podname string) (PodConfig, error) {
 	pod, exists := c.ManagedPodConfigs[podname]
 	if !exists {
@@ -77,6 +53,11 @@ func ParseSentinelConfig(filename string) (SentinelConfig, error) {
 				config.Host = entries[1]
 			case "":
 				if err == io.EOF {
+					myname := fmt.Sprintf("%s:%s", config.Host, config.Port)
+					for _, pod := range config.ManagedPodConfigs {
+						pod.KnownSentinels = append(pod.KnownSentinels, myname)
+						config.ManagedPodConfigs[pod.Name] = pod
+					}
 					return config, nil
 				}
 			default:
