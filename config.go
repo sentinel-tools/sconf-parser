@@ -53,7 +53,13 @@ func ParseSentinelConfig(filename string) (SentinelConfig, error) {
 				config.Host = entries[1]
 			case "":
 				if err == io.EOF {
-					myname := fmt.Sprintf("%s:%s", config.Host, config.Port)
+					if config.Host == "" {
+						config.Host = "127.0.0.1"
+					}
+					if config.Port == 0 {
+						config.Port = 26379
+					}
+					myname := fmt.Sprintf("%s:%d", config.Host, config.Port)
 					for _, pod := range config.ManagedPodConfigs {
 						pod.KnownSentinels = append(pod.KnownSentinels, myname)
 						config.ManagedPodConfigs[pod.Name] = pod
